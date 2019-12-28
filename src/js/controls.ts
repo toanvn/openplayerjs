@@ -22,6 +22,7 @@ import { isVideo } from './utils/general';
  * @implements PlayerComponent
  */
 class Controls implements PlayerComponent {
+    private firstLoad:boolean;
     /**
      * Instance of Settings object.
      *
@@ -111,6 +112,7 @@ class Controls implements PlayerComponent {
      * @memberof Controls
      */
     public create(): void {
+        this.firstLoad = true;
         this.player.getElement().controls = false;
 
         const isMediaVideo = isVideo(this.player.getElement());
@@ -185,6 +187,7 @@ class Controls implements PlayerComponent {
                 this.player.getContainer().addEventListener(event, this.events.mouse[event]);
             });
 
+            this.player.getContainer().classList.add('op-controls--hidden');
             // Initial countdown to hide controls
             this._startControlTimer(3000);
         }
@@ -246,9 +249,12 @@ class Controls implements PlayerComponent {
         this._stopControlTimer();
 
         this.timer = window.setTimeout(() => {
-            if ((!el.paused || !el.ended) && isVideo(this.player.getElement())) {
+            if ((/*!el.loaded ||*/ !el.paused || !el.ended) && isVideo(this.player.getElement())) {
                 this.player.getContainer().classList.add('op-controls--hidden');
-                this.player.playBtn.setAttribute('aria-hidden', 'true');
+                if(!this.firstLoad) {
+                    this.player.playBtn.setAttribute('aria-hidden', 'true');
+                }
+                this.firstLoad = false;
                 this._stopControlTimer();
                 const event = addEvent('controlshidden');
                 this.player.getElement().dispatchEvent(event);

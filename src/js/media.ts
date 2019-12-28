@@ -400,7 +400,7 @@ class Media {
     get paused(): boolean {
         return this.media ? this.media.paused : this.element.paused;
     }
-
+    
     /**
      *
      * @see [[Native.ended]]
